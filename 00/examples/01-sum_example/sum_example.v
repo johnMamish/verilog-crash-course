@@ -20,6 +20,7 @@ module sum_example();
 
     ////////////////////////////////////////////////////////////////
     // Testbench
+    integer i;
     initial begin
         $dumpfile("sum_example.vcd");
         $dumpvars(0, sum_example);
@@ -39,6 +40,13 @@ module sum_example();
         a = 8'hff;
         b = 8'hff;
         #10;
+
+        // we can also put a bunch of random integers into our adder
+        for (i = 0; i < 50; i = i + 1) begin
+            a = $random;
+            b = $random;
+            #10;
+        end
 
         $finish;
     end
