@@ -2,6 +2,9 @@
 
 #### Using `always @*` and `reg`
 
+
+##### Hi
+
 Verilog is a text-based language that can be used to describe logic circuits that are built out of wires, logic gates, multiplexers, and other primitives. Once you know your way around Verilog, you'll find that there's a pretty clear correlation between many Verilog constructs and schematics that you'd see drawn on a sheet. Unlike hand-drawn schematics, though, Verilog is faster and often easier to write, and works nicely with source-code management tools.
 
 In this first set of crash-course examples, we'll talk about some very basic Verilog language constructs. I'll also give some rules that Verilog technically allows you to break, but will make your code much harder to write or maintian. I might also tell some little white lies about Verilog that make it easier to understand.
@@ -9,3 +12,55 @@ In this first set of crash-course examples, we'll talk about some very basic Ver
 In each of the "Example" folders here, you'll find a simple example demonstrating these basic principles in one way or another. Most of the useful information I've written up will be in the comments of those source files.
 
 They can each be made by running 'make', and then you can look at what the circuit did by opening the generated ".vcd" file with gtkwave.
+
+##### `reg`
+A `reg` is a logical entity in Verilog made up of bits (which can nominally be `0` or `1`). A single `reg` can hold 1 bit or many bits.
+
+```Verilog
+    reg        my_boolean;   // declares a 1-bit reg.
+    reg        a, b;         // declares 2 1-bit regs, called 'a' and 'b'.
+    reg [31:0] my_integer;   // declares a 32-bit reg whose bits are numbered 0 to 31.
+```
+
+##### `always @*` (a.k.a `always @(*)`)
+For a reg to be driven by combinational logic (a blob of `and`s, `or`s, `not`s, adders, `mux`es, etc... which doesn't loop back on itself), we use an `always @(*)` block.
+
+```Verilog
+    // here, "begin" acts like an opening curly brace would in C++/Java, and "end" acts like a
+    // closing curly brace.
+    always @* begin
+        // my_boolean is continuously updated with the value of (a & b); immediately after 'a' or
+        // 'b' changes, 'my_boolean' is updated.
+        my_boolean = a & b;
+    end
+```
+
+We assign values to `reg`s inside an `always @*` block using the `=` sign. You shouldn't assign a reg's value to itself in an `always @*` block, it should be a combination of other `reg`s.
+
+If a `reg` has a value assigned to it inside an `always @*` block, it should be assigned to exactly once within that `always @*` block. Having cases where you assign to it more than once is fine, but it can make code that's difficult to debug when you're just starting out. Having cases where you assign to it zero times is really bad because the Verilog compiler will inadvertently generate an SR latch.
+
+```Verilog
+    // Good example, my_boolean is assigned to exactly once inside this always @* block.
+    always @* begin
+        my_boolean = a | b;
+    end
+
+    // This is also perfectly ok. Only one side of the 'if' statement will ever be true, so
+    // my_boolean is assigned to exactly once.
+    always @* begin
+        if ((a & !b) || (b & !a)) begin
+            my_boolean = a;
+        end else begin
+            my_boolean = 0;
+        end
+    end
+
+    // This is a problem. The Verilog compiler will generate a latch.
+    always @* begin
+        if (a) begin
+            my_boolean = !b;
+        end
+    end
+```
+
+your `always @*` blocks should only specify forward-propagating combinational logic. If you have cases in an `always @*` block where a `reg` isn't assigned a value, the Verilog compiler will inadvertently generate a latch. This is bad because latches like that are difficult to analyze timing for.
