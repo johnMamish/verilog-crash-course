@@ -61,7 +61,7 @@ module adder_exercise_tb();
             #9;
         end
 
-        $display("all tests passed");
+        $display("all tests passed!");
         $finish;
     end
 endmodule
