@@ -32,6 +32,9 @@ module find_first_set_exercise_tb();
 
     integer i;
     initial begin
+        $dumpfile("find_first_set_exercise.vcd");
+        $dumpvars(0, find_first_set_exercise_tb);
+
         n = 4'b0000;
         #10;
         if (none_set !== 1'b1) begin
