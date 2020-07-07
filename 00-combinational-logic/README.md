@@ -5,7 +5,7 @@
 
 ##### Hi
 
-Verilog is a text-based language that can be used to describe logic circuits that are built out of wires, combinational logic (blobs of logic gates), and flip-flops. Once you know your way around Verilog, you'll find that there's a pretty clear correlation between many Verilog constructs and schematics that you'd see drawn on a sheet. Unlike hand-drawn schematics, though, Verilog is often faster and easier to write, and it works more nicely with source-code management tools like git.
+Verilog is a text-based language that can be used to describe logic circuits that are built out of wires, combinational logic (blobs of logic gates), and flip-flops. It's often easy to convert graphical schematics to Verilog, but Verilog is often faster and easier to write than schematics, and it works more nicely with source-code management tools like git.
 
 In this first set of crash-course examples, we'll talk about some very basic Verilog language constructs. I'll also give some rules that Verilog technically allows you to break, but will make your code much harder to write or maintian. I might also tell some little white lies about Verilog that make it easier to understand.
 
@@ -68,5 +68,4 @@ If a `reg` has a value assigned to it inside an `always @*` block, it should be 
         end
     end
 ```
-
-your `always @*` blocks should only specify forward-propagating combinational logic. If you have cases in an `always @*` block where a `reg` isn't assigned a value, the Verilog compiler will inadvertently generate a latch. This is bad because latches like that are difficult to analyze timing for.
+Inadvertently generating a non-edge-triggered SR latch is bad because circuits containing them are more prone to timing glitches and can be much harder to debug. Well-crafted code is easy for others to read and easy for you to debug, so generating SR latches should be avoided.
