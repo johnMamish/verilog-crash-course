@@ -9,19 +9,6 @@ module saturating_counter(input clock,
 
                           output reg [7:0] counter);
 
-    always @(posedge clock) begin
-        if (reset) begin
-            counter <= 8'h00;
-        end else begin
-            if (counter == 8'hc7) begin
-                counter <= 8'hc7;
-            end else if (counter > 8'hc7) begin
-                counter <= 8'h00;
-            end else begin
-                counter <= counter + 8'h1;
-            end
-        end
-    end
 endmodule
 
 module saturating_counter_exercise_tb();
